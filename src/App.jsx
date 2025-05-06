@@ -1,10 +1,12 @@
 // src/App.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { getTodos, addTodo, toggleTodoComplete, deleteTodo } from './api/firebase/firestore'; // 作成したAPI関数をインポート
+// 変更点: updateTodoPriority をインポート
+import { getTodos, addTodo, toggleTodoComplete, deleteTodo, updateTodoPriority } from './api/firebase/firestore'; // 作成したAPI関数をインポート
 
 function App() {
   const [todos, setTodos] = useState([]); // TODOリストの状態
   const [newTodoText, setNewTodoText] = useState(''); // 新規TODO入力テキストの状態
+  const [newTodoPriority, setNewTodoPriority] = useState(3); // 新規TODOの重要度状態
   const [isLoading, setIsLoading] = useState(true); // ローディング状態
   const [error, setError] = useState(null); // エラー状態
 
@@ -34,8 +36,10 @@ function App() {
     if (!newTodoText.trim()) return; // 空文字の場合は追加しない
 
     try {
-      await addTodo(newTodoText);
+      // 変更点: addTodo に priority を渡す
+      await addTodo(newTodoText, newTodoPriority);
       setNewTodoText(''); // 入力欄をクリア
+      setNewTodoPriority(3); // 追加後、重要度をデフォルトに戻す
       fetchTodos(); // リストを再取得して更新
     } catch (err) {
       console.error("Failed to add todo:", err);
@@ -60,6 +64,22 @@ function App() {
     }
   };
 
+    // 新規追加: 重要度変更処理
+    const handleChangePriority = async (id, newPriority) => {
+      try {
+        await updateTodoPriority(id, newPriority);
+        setTodos(prevTodos =>
+          prevTodos.map(todo =>
+            todo.id === id ? { ...todo, priority: Number(newPriority) } : todo
+          )
+        );
+      } catch (err)
+        {
+        console.error("Failed to change priority:", err);
+        setError("重要度の変更に失敗しました。");
+      }
+    };
+
   // --- TODO削除処理 ---
   const handleDeleteTodo = async (id) => {
     // 確認ダイアログ（任意）
@@ -75,6 +95,11 @@ function App() {
     }
   };
 
+    // 重要度を星で表示するヘルパー関数 (任意)
+    const renderPriorityStars = (priority) => {
+      return '★'.repeat(priority) + '☆'.repeat(5 - priority);
+    };
+
   // --- レンダリング ---
   return (
     <div className="App">
@@ -89,6 +114,20 @@ function App() {
           placeholder="新しいTODOを入力"
           disabled={isLoading} // ローディング中は無効化
         />
+        {/* 重要度選択の追加 */}
+        <select
+          value={newTodoPriority}
+          onChange={(e) => setNewTodoPriority(Number(e.target.value))}
+          disabled={isLoading}
+          style={{ marginLeft: '0.5em', padding: '0.6em', borderRadius: '8px' }}
+        >
+          <option value={1}>★☆☆☆☆</option>
+          <option value={2}>★★☆☆☆</option>
+          <option value={3}>★★★☆☆</option>
+          <option value={4}>★★★★☆</option>
+          <option value={5}>★★★★★</option>
+        </select>
+
         <button type="submit" disabled={isLoading || !newTodoText.trim()}>
           {isLoading ? '追加中...' : '追加'}
         </button>
@@ -113,6 +152,21 @@ function App() {
               <span className={todo.completed ? 'completed' : ''}>
                 {todo.text}
               </span>
+              {/* 重要度表示と変更UIの追加 */}
+              <select
+                value={todo.priority || 3} // priorityがない場合はデフォルト3
+                onChange={(e) => handleChangePriority(todo.id, e.target.value)}
+                style={{ margin: '0 0.5em', padding: '0.3em', borderRadius: '4px' }}
+              >
+                <option value={1}>★</option>
+                <option value={2}>★★</option>
+                <option value={3}>★★★</option>
+                <option value={4}>★★★★</option>
+                <option value={5}>★★★★★</option>
+              </select>
+              {/* <span style={{ margin: '0 0.5em', minWidth: '70px', textAlign: 'left' }}>
+                {renderPriorityStars(todo.priority || 3)}
+              </span> */}
               <button onClick={() => handleDeleteTodo(todo.id)}>削除</button>
             </li>
           ))}
