@@ -1,0 +1,100 @@
+/* src/index.css */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center; /* 中央寄せのため */
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+  width: 100%; /* 幅を確保 */
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+input[type="text"] {
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    margin-right: 0.5em;
+    border-radius: 8px;
+    border: 1px solid #555;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 2em;
+}
+
+li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8em 0;
+    border-bottom: 1px solid #444;
+}
+
+li span {
+    flex-grow: 1;
+    text-align: left;
+    margin: 0 1em;
+}
+
+li span.completed {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+/* ダークモード対応 (任意) */
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+  input[type="text"] {
+      border-color: #ccc;
+      background-color: #fff;
+      color: #213547;
+  }
+  li {
+      border-bottom-color: #eee;
+  }
+}
