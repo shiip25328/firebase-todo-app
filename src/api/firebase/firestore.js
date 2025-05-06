@@ -33,12 +33,13 @@ export const getTodos = async () => {
 };
 
 // 新しいTODOを追加する関数
-export const addTodo = async (text) => {
+export const addTodo = async (text, priority = 3) => {// priorityのデフォルト値を3に設定
   try {
     // 追加するデータ
     const newTodo = {
       text: text,          // TODOの内容
       completed: false,    // 初期状態は未完了
+      priority: Number(priority), // 数値として保存
       createdAt: serverTimestamp(), // 作成日時 (サーバー側で設定)
     };
     const docRef = await addDoc(todosCollectionRef, newTodo);
@@ -63,6 +64,20 @@ export const toggleTodoComplete = async (id, currentStatus) => {
     throw error;
   }
 };
+
+// 新規追加: 重要度を更新する関数
+export const updateTodoPriority = async (id, newPriority) => {
+    try {
+      const todoDocRef = doc(db, "todos", id);
+      await updateDoc(todoDocRef, {
+        priority: Number(newPriority), // 数値として保存
+      });
+      console.log("Todo priority updated: ", id, "to", newPriority);
+    } catch (error) {
+      console.error("Error updating todo priority: ", error);
+      throw error;
+    }
+  };
 
 // TODOを削除する関数
 export const deleteTodo = async (id) => {
